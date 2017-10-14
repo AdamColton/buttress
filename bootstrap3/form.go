@@ -83,9 +83,18 @@ func (f *Form) ConfirmPassword(id string) *ConfirmPassword {
 	return c
 }
 
-func (f *Form) Post(action string) {
+func (f *Form) HTML(node html.Node) *HTML {
+	h := &HTML{
+		Node: node,
+	}
+	f.Inputs = append(f.Inputs, h)
+	return h
+}
+
+func (f *Form) Post(action string) *Form {
 	f.Method = "post"
 	f.Action = action
+	return f
 }
 
 type Input interface {
@@ -122,6 +131,10 @@ func (i *InputTag) FormRender(formStyle *FormStyle) html.Node {
 	label := html.NewTag("label", "for", i.ID)
 	label.AddChildren(html.NewText(i.Label))
 	var input html.TagNode = html.NewVoidTag("input", "type", i.Type, "class", "form-control", "id", i.ID, "name", i.Name, "value", i.Value)
+	if formStyle.HideLabels {
+		label.AddAttributes("class", "sr-only")
+		input.AddAttributes("placeholder", i.Label)
+	}
 	if !formStyle.Inline {
 		label.AddAttributes("class", "control-label "+formStyle.Label.String())
 		div := html.NewTag("div", "class", formStyle.Input.String())
@@ -259,4 +272,16 @@ func (c *ConfirmPassword) FormRender(formStyle *FormStyle) html.Node {
 	in2.Name = c.Name + "_confirm"
 
 	return html.NewFragment(in1.FormRender(formStyle), in2.FormRender(formStyle))
+}
+
+type HTML struct {
+	Node html.Node
+}
+
+func (h *HTML) Render() html.Node {
+	return h.Node
+}
+
+func (h *HTML) FormRender(formStyle *FormStyle) html.Node {
+	return h.Node
 }

@@ -62,3 +62,12 @@ func (a attributes) Remove(key string) {
 	key = strings.ToLower(key)
 	delete(a, key)
 }
+
+func (a attributes) AppendClass(class string) {
+	old := a["class"]
+	if old == "" {
+		a["class"] = class
+	} else {
+		a["class"] = old + " " + class
+	}
+}

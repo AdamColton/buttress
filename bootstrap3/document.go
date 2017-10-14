@@ -33,3 +33,13 @@ func NewDocument(title string) *Document {
 		nav:      nav,
 	}
 }
+
+func (d *Document) CSSLinks(hrefs ...string) *Document {
+	d.Document.CSSLinks(hrefs...)
+	return d
+}
+
+func (d *Document) ScriptLinks(srcs ...string) *Document {
+	d.Document.ScriptLinks(srcs...)
+	return d
+}

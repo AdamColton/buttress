@@ -29,7 +29,9 @@ func (p *Panel) Render() html.Node {
 	if p.Title != "" {
 		b.Tag("div", "class", "panel-heading").Text(p.Title).Close()
 	}
-	b.Tag("div", "class", "panel-body").
-		AddChildren(p.Contents)
+	b.Tag("div", "class", "panel-body")
+	if p.Contents != nil {
+		b.AddChildren(p.Contents)
+	}
 	return ret
 }

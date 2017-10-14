@@ -14,3 +14,7 @@ func StringToTime(str string) time.Time {
 	t, _ := time.Parse(TimeFormat, str)
 	return t
 }
+
+type RowScanner interface {
+	Scan(...interface{}) error
+}

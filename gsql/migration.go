@@ -35,32 +35,37 @@ var Migrations = map[string]Migration{
 	},
 }
 
-func Migrate() {
-	hasRun := getMigrationsRan()
+func Migrate() error {
+	hasRun, err := getMigrationsRan()
+	if err != nil {
+		return err
+	}
 	var run []string
 	for name, _ := range Migrations {
 		if !hasRun[name] {
 			run = append(run, name)
 		}
 	}
-	sort.Slice(run, func(i, j int) bool {
-		return run[i] < run[j]
-	})
+	sort.Strings(run)
 
 	for _, name := range run {
-		runMigration(name)
+		if err := runMigration(name); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func Describe() string {
-	hasRan := getMigrationsRan()
+func Describe() (string, error) {
+	hasRan, err := getMigrationsRan()
+	if err != nil {
+		return "", err
+	}
 	var all []string
 	for name, _ := range Migrations {
 		all = append(all, name)
 	}
-	sort.Slice(all, func(i, j int) bool {
-		return all[i] < all[j]
-	})
+	sort.Strings(all)
 	for i, s := range all {
 		if hasRan[s] {
 			all[i] = "* " + s
@@ -68,7 +73,7 @@ func Describe() string {
 			all[i] = "  " + s
 		}
 	}
-	return strings.Join(all, "\n")
+	return strings.Join(all, "\n"), nil
 }
 
 func AddMigration(name, up, down string) Migration {
@@ -79,51 +84,57 @@ func AddMigration(name, up, down string) Migration {
 	Migrations[name] = m
 	return m
 }
-func getMigrationsRan() map[string]bool {
+func getMigrationsRan() (map[string]bool, error) {
 	hasRan := make(map[string]bool)
 
 	rows, err := Conn.Query("SHOW TABLES LIKE 'migrations';")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	if !rows.Next() {
 		// not even migration migration has run yet
-		return hasRan
+		return hasRan, nil
 	}
 
 	rows, err = Conn.Query("SELECT `name` FROM `migrations`")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	var name string
 
 	for rows.Next() {
 		if err := rows.Scan(&name); err != nil {
-			panic(err)
+			return nil, err
 		}
 		hasRan[name] = true
 	}
-	return hasRan
+	return hasRan, nil
 }
 
-func runMigration(migration string) {
+func runMigration(migration string) error {
 	_, err := Conn.Exec(Migrations[migration].Up)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	Conn.Exec("INSERT INTO migrations (name) VALUES (?)", migration)
+	_, err = Conn.Exec("INSERT INTO migrations (name) VALUES (?)", migration)
+	return err
 }
 
-func Rollback() string {
-	rows, _ := Conn.Query("SELECT `id`,`Name` FROM `migrations` ORDER BY `Name` DESC LIMIT 1;")
-	if !rows.Next() {
-		// not even migration migration has run yet
-		return ""
+func Rollback() (string, error) {
+	rows, err := Conn.Query("SELECT `id`,`Name` FROM `migrations` ORDER BY `Name` DESC LIMIT 1;")
+	if err != nil || !rows.Next() {
+		return "", err
 	}
 	var id int
 	var name string
 	rows.Scan(&id, &name)
-	Conn.Exec(Migrations[name].Down)
-	Conn.Exec("DELETE FROM `migrations` WHERE `id`=?;", id)
-	return name
+	_, err = Conn.Exec(Migrations[name].Down)
+	if err != nil {
+		return "", err
+	}
+	_, err = Conn.Exec("DELETE FROM `migrations` WHERE `id`=?;", id)
+	if err != nil {
+		return "", err
+	}
+	return name, nil
 }

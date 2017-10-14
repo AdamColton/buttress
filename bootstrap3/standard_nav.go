@@ -7,6 +7,8 @@ import (
 	"github.com/adamcolton/buttress/html/query"
 )
 
+// https://getbootstrap.com/docs/3.3/components/#nav
+
 var standardNav = query.NewPrototype(qhtml.MustParse(`
 	<nav.navbar.navbar-default.navbar-static-top>
 		<div.container>
@@ -83,9 +85,13 @@ type standardMenuItem struct {
 }
 
 func (smi standardMenuItem) addSubmenu(b *builder.Builder) {
-	b.Tag("li").
-		Tag("a", smi.Attrs()...)
-	Icon(b, smi.Icon())
-	b.Text(smi.Title()).
-		Close().Close()
+	if smi.IsDivider() {
+		b.Tag("li", "role", "separator", "class", "divider").Close()
+	} else {
+		b.Tag("li").
+			Tag("a", smi.Attrs()...)
+		Icon(b, smi.Icon())
+		b.Text(smi.Title()).
+			Close().Close()
+	}
 }

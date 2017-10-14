@@ -20,7 +20,6 @@ var (
 )
 
 func main() {
-	csssize.ExtraSmall()
 	panelClass = bootstrap3.NewColClass()
 	panelClass.SetSize(12, csssize.ExtraSmall())
 	panelClass.SetSizeOffset(10, 1, csssize.Medium())

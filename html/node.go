@@ -69,4 +69,5 @@ type TagNode interface {
 	AddAttributes(attrs ...string)
 	AddEmptyAttributes(attrs ...string)
 	Remove(key string)
+	AppendClass(class string)
 }
