@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="c_4"><label for="name">Name</label></div>
+  <div class="c_8"><input type="text" id="name" name="name" /></div>
+</div>
+
+<form-text-input label="Name" id="name" />
+
+<define form-text-input labelWidth="4" inputWidth="8">
+  <div>
+    <div.c_{{labelWidth}}><label for="{{id}}">{{label}}</></>
+    <div.c_{{inputWidth}}><text_input#{{id}} /></>
+  </>
+</>
+
+the first thing is the tag, with an alias mechanism
+after that
+.Name to add a class
+#Name to add an id (and name for inputs)
+
+and at the last thing can be
+=string
+to set [PRIMARY ATTR]=string
+* any input -> value
+* label -> for
+
+input types will be aliased:
+* hidden
+* text
+* password
+* checkbox
+* integer?
+* number?
+
+For any input type (including textarea and select) the id will also be the name
+
+For radio buttons:
+<radio#foo="1" />
+<radio#foo="2" />
+<radio#foo="3" />
+will become
+<input type="radio" id="foo_1" name="foo" value="1" />
+<input type="radio" id="foo_2" name="foo" value="2" />
+<input type="radio" id="foo_3" name="foo" value="3" />
+
+how to handle layering
+
+<define form-input labelWidth="4" inputWidth="8">
+  <div>
+    <div.c_{{labelWidth}}><label for="{{id}}">{{label}}<.><.>
+    <div.c_{{inputWidth}}><field /><.>
+  </>
+</>
+
+<define form-text-input>
+  <field>
+    <text_input#{{id}} />
+  </field>
+</>
+
+So I think this will be a multi-pass thing. I'll do one pass to parse qhtml into
+an html template. A second pass to generate the template.
+
+What I really want is something like this this:
+
+html.GenerateTemplate(task, upsert)
+where task is a gothicmodel and upsert holds the details for generating an
+upsert tempate from task
+
+upsert:
+<form submit="form.save{{.Name}}">
+  {{range .Fields}} {{UpsertField .}} {{end}}
+  {{template "FieldRow" save ???}}
+</form>

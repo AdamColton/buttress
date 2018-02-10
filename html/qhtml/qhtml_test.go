@@ -25,7 +25,7 @@ func TestParseDocument(t *testing.T) {
       <button>Save</button>
     </>
 `
-	html, err := Document(example)
+	doc, err := Document(example)
 	assert.NoError(t, err)
 
 	expected := `<!DOCTYPE html>
@@ -52,7 +52,7 @@ func TestParseDocument(t *testing.T) {
   <script src="/js/bar.js"></script>
 </body>`
 	html.Padding = "  "
-	assert.Equal(t, expected, html.String(html))
+	assert.Equal(t, expected, html.String(doc))
 }
 
 func TestParseFragment(t *testing.T) {
@@ -71,7 +71,7 @@ func TestParseFragment(t *testing.T) {
       <button>Save</button>
     </>
 `
-	html, err := Parse(example)
+	nodes, err := Parse(example)
 	assert.NoError(t, err)
 
 	expected := `<div class="row">
@@ -88,5 +88,5 @@ func TestParseFragment(t *testing.T) {
   <button>Save</button>
 </div>`
 	html.Padding = "  "
-	assert.Equal(t, expected, html.String(html))
+	assert.Equal(t, expected, html.String(nodes))
 }

@@ -17,7 +17,7 @@ func NewFormBuilder(formStyle *bootstrap3.FormStyle) *FormBuilder {
 	}
 }
 
-func (fg *FormBuilder) Form(fields []gothicmodel.Field, types TypeMap) *bootstrap3.Form {
+func (fg *FormBuilder) NewForm(fields []gothicmodel.Field, types TypeMap) *bootstrap3.Form {
 	var ig InputBuilder
 	f := bootstrap3.NewForm(fg.Style)
 

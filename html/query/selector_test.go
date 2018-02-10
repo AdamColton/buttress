@@ -34,9 +34,9 @@ func TestSelect(t *testing.T) {
 	head := html.NewTag("head")
 	head.AddChildren(title)
 
-	html := html.NewTag("html")
-	html.AddChildren(head, body)
-	root := html.NewFragment(html.NewDoctype("html"), html)
+	htm := html.NewTag("html")
+	htm.AddChildren(head, body)
+	root := html.NewFragment(html.NewDoctype("html"), htm)
 
 	s := selectors{
 		&selector{

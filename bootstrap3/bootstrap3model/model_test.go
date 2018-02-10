@@ -2,6 +2,7 @@ package bootstrap3model
 
 import (
 	"github.com/adamcolton/buttress/bootstrap3"
+	"github.com/adamcolton/buttress/bootstrap3/csssize"
 	"github.com/adamcolton/buttress/html"
 	"github.com/adamcolton/gothic/gothicmodel"
 	"github.com/stretchr/testify/assert"
@@ -10,7 +11,7 @@ import (
 
 func LapizValueBuilder(name string) string { return "$" + name }
 
-func setup() (*gothicmodel.Model, *bootstrap3.FormStyle) {
+func setup() (*gothicmodel.GothicModel, *bootstrap3.FormStyle) {
 	m, err := gothicmodel.New("test", gothicmodel.Fields{
 		{"ID", "uint"},
 		{"Name", "string"},
@@ -23,8 +24,8 @@ func setup() (*gothicmodel.Model, *bootstrap3.FormStyle) {
 	}
 
 	fs := bootstrap3.NewFormStyle()
-	fs.Label.SetSizeOffset(3, 2, bootstrap3.CSSSizeExtraSmall)
-	fs.Input.SetSize(4, bootstrap3.CSSSizeExtraSmall)
+	fs.Label.SetSizeOffset(3, 2, csssize.ExtraSmall())
+	fs.Input.SetSize(4, csssize.ExtraSmall())
 
 	return m, fs
 }
@@ -36,12 +37,12 @@ func TestModel(t *testing.T) {
 	b := NewFormBuilder(fs)
 	b.ValueBuilder = LapizValueBuilder
 
-	f := b.Form(m.Fields("Name", "Password"), nil)
-	f.Button("Save")
+	f := b.NewForm(m.Fields("Name", "Password"), nil)
+	f.AddButton("Save", "")
 
 	// simulate a create
-	f = b.Form(m.Fields("Name", "Password"), TypeMap{"password": ConfirmPassword})
-	f.Button("Create")
+	f = b.NewForm(m.Fields("Name", "Password"), TypeMap{"password": ConfirmPassword})
+	f.AddButton("Create", "")
 	s := html.String(f.Render())
 	println(s)
 }

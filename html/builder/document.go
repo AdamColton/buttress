@@ -8,7 +8,7 @@ import (
 type Document struct {
 	header  *html.Tag
 	body    *html.Fragment
-	scripts *html.Fragment
+	Scripts *html.Fragment
 	doc     *html.Fragment
 }
 
@@ -25,8 +25,8 @@ func NewDocument(title string, attrs ...string) *Document {
 
 	body := html.NewTag("body", attrs...)
 	doc.body = html.NewFragment()
-	doc.scripts = html.NewFragment()
-	body.AddChildren(doc.body, doc.scripts)
+	doc.Scripts = html.NewFragment()
+	body.AddChildren(doc.body, doc.Scripts)
 
 	html := html.NewTag("html")
 	html.AddChildren(doc.header, body)
@@ -46,8 +46,8 @@ func (d *Document) Build() *Builder {
 	}
 }
 
-func (d *Document) Write(w io.Writer) {
-	d.doc.Write(w)
+func (d *Document) WriteTo(w io.Writer) (n int64, err error) {
+	return d.doc.WriteTo(w)
 }
 
 func (d *Document) String() string {
@@ -63,7 +63,12 @@ func (d *Document) CSSLinks(hrefs ...string) *Document {
 
 func (d *Document) ScriptLinks(srcs ...string) *Document {
 	for _, src := range srcs {
-		d.scripts.AddChildren(html.NewTag("script", "src", src))
+		d.Scripts.AddChildren(html.NewTag("script", "src", src))
 	}
+	return d
+}
+
+func (d *Document) Meta(attrs ...string) *Document {
+	d.header.AddChildren(html.NewVoidTag("meta", attrs...))
 	return d
 }

@@ -33,6 +33,7 @@ type GorillaUserStore struct {
 		MinNameLen      int
 		MinPasswordLen  int
 	}
+	Server
 }
 
 func (gus *GorillaUserStore) Get(r *http.Request) (*sessions.Session, error) {
@@ -174,7 +175,20 @@ func (gus *GorillaUserStore) LoginHandler(success, failure http.HandlerFunc) htt
 		if err != nil || u == nil {
 			failure(w, r)
 		} else {
-			success(w, r)
+			s, _ := gus.Get(r)
+			var url string
+			urlIfc, ok := s.Values["redirect"]
+			if ok {
+				url, ok = urlIfc.(string)
+			}
+			if ok {
+				delete(s.Values, "redirect")
+				s.Save(r, w)
+				http.Redirect(w, r, url, 302)
+				return
+			} else {
+				success(w, r)
+			}
 		}
 	}
 }
@@ -184,4 +198,27 @@ func (gus *GorillaUserStore) SignOutHandler(after http.HandlerFunc) http.Handler
 		gus.SignOut(r, w)
 		after(w, r)
 	}
+}
+
+type Server interface {
+	HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
+}
+
+type Router struct {
+	Gus   *GorillaUserStore
+	Login string
+	Server
+}
+
+func (gr *Router) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
+	gr.Server.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+		id, _ := gr.Gus.Auth(r)
+		if id == nil {
+			s, _ := gr.Gus.Get(r)
+			s.Values["redirect"] = r.URL.String()
+			http.Redirect(w, r, gr.Login, 302)
+		} else {
+			handler(w, r)
+		}
+	})
 }

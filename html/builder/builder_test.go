@@ -10,7 +10,7 @@ func TestBuilder(t *testing.T) {
 	div := New().
 		Tag("div", "id", "testing").
 		Text("this is a test").
-		Cur()
+		Root()
 	expected := `<div id="testing">this is a test</div>`
 	assert.Equal(t, expected, html.String(div))
 }

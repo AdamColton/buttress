@@ -62,7 +62,7 @@ func TestRow(t *testing.T) {
 	for i := 0; i < 13; i++ {
 		node := html.NewTag("div")
 		node.AddChildren(html.NewText(fmt.Sprintf("Cell %d", i)))
-		r.AddNode(c, node)
+		r.AddNodes(c, node)
 	}
 
 	out := r.Render()
@@ -107,10 +107,10 @@ func TestDemo(t *testing.T) {
 	f.Style.Input.SetSize(5, csssize.Small())
 	f.Style.Input.SetSize(4, csssize.Medium())
 	f.Style.Input.SetSize(3, csssize.Large())
-	f.InputTag("text", "Name", "name")
-	f.InputTag("text", "Age", "age")
-	f.InputTag("text", "Role", "role")
-	f.Buttons("Save", "save", "floppy-o", csscontext.Success()).AddButton("Cancel", "cancel", csscontext.Danger())
+	f.AddInputTag("text", "Name", "name")
+	f.AddInputTag("text", "Age", "age")
+	f.AddInputTag("text", "Role", "role")
+	f.AddButtons("Save", "save", "floppy-o", csscontext.Success()).AddButton("Cancel", "cancel", "", csscontext.Danger())
 
 	panel := NewPanel("Hello", f.Render())
 	panel.ContextClass = csscontext.Primary()
@@ -136,13 +136,19 @@ func TestForm(t *testing.T) {
 	f := &Form{
 		Style: fs,
 	}
-	f.InputTag("text", "Name", "name")
-	f.InputTag("text", "Age", "age")
-	f.InputTag("text", "Role", "role")
-	f.ConfirmPassword("password")
-	f.Button("Save", "user")
+	f.AddInputTag("text", "Name", "name")
+	f.AddInputTag("text", "Age", "age")
+	f.AddInputTag("text", "Role", "role")
+	f.AddText("TextTest", "here is some text")
+	f.AddConfirmPassword("password")
+	f.AddSelect("SelectTest", "selectMe", []SelectOption{
+		{"foo", "FOO"},
+		{"bar", "Bar"},
+	})
+	f.AddButton("Save", "user")
 
 	s := html.String(f.Render())
 	assert.Contains(t, s, `<form class="form-horizontal">`)
+
 	println(s)
 }

@@ -20,9 +20,11 @@ func NewDoctype(doctype string) *Doctype {
 	return d
 }
 
-// Write Doctype to an io.Writer
-func (d *Doctype) Write(w io.Writer) {
-	d.write(newWriter(w))
+// WriteTo Doctype to an io.Writer
+func (d *Doctype) WriteTo(w io.Writer) (n int64, err error) {
+	nw := newWriter(w)
+	d.write(nw)
+	return int64(nw.sum), nw.err
 }
 
 func (d *Doctype) write(w *writer) {

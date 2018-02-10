@@ -28,32 +28,3 @@ func RedirectFunc(path string, code int) http.HandlerFunc {
 		http.Redirect(w, r, path, code)
 	}
 }
-
-/*
-
-type SocketLoop struct {
-	writeCh chan []byte
-	readCh  chan []byte
-	close   chan bool
-}
-
-type LoopCallback func(read <-chan []byte, send chan<- byte, closeLoop chan<- bool)
-
-func LoopRunner(callback LoopCallback) SocketHandler {
-	return func(req *http.Request, socket *websocket.Conn) {
-		read := ReadSocket(socket, 3)
-		send := make(chan []byte, 3)
-		closeLoop := make(chan bool)
-		go callback(read, send, closeLoop)
-		for {
-			select {
-			case msg := <-send:
-				socket.WriteMessage(1, msg)
-			case <-closeLoop:
-				socket.Close()
-				return
-			}
-		}
-	}
-}
-*/

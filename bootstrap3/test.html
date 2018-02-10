@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <header>
+    <title>Bootstrap Demo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700" rel="stylesheet" type="text/css" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  </header>
+  <body id="app-layout">
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button aria-controls="navbar" aria-expanded="false" class="navbar-toggle collapsed" data-target="#navbar" data-toggle="collapse" type="button">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#home" id="brand">Gothic Testing</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar">
+          <ul class="nav navbar-nav" id="nav-left">
+            <li>
+              <a href="#home" id="home" role="button">
+                <i aria-hidden="true" class="fa fa-home"></i>
+                Home
+              </a>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right" id="nav-right">
+            <li>
+              <a href="#register" id="register" role="button">Register</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-md-10 col-md-offset-1">
+          <div class="panel panel-primary">
+            <div class="panel-heading">Hello</div>
+            <div class="panel-body">
+              <form class="form-horizontal">
+                <div class="form-group">
+                  <label class="control-label col-sm-4" for="name">Name</label>
+                  <div class="col-sm-5 col-md-4 col-lg-3">
+                    <input class="form-control" id="name" name="name" type="text" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-4" for="age">Age</label>
+                  <div class="col-sm-5 col-md-4 col-lg-3">
+                    <input class="form-control" id="age" name="age" type="text" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-sm-4" for="role">Role</label>
+                  <div class="col-sm-5 col-md-4 col-lg-3">
+                    <input class="form-control" id="role" name="role" type="text" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-4"></div>
+                  <div class="col-sm-5 col-md-4 col-lg-3">
+                    <button class="btn btn-success" value="save">Save</button>
+                    <button class="btn btn-danger" value="cancel">Cancel</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -14,6 +14,7 @@ type Server interface {
 	ListenAndServe(addr string)
 	ServeFile(pattern, path string)
 	ServeDirectory(pattern, path string)
+	Upgrade(http.ResponseWriter, *http.Request, http.Header) (*websocket.Conn, error)
 }
 
 type SocketHandler func(*http.Request, *websocket.Conn)

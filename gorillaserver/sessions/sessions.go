@@ -34,26 +34,6 @@ func NewCookieStore(keyPairs ...[]byte) *Store {
 	return &Store{sessions.NewCookieStore(keyPairs...)}
 }
 
-func (s *Session) String(name, dflt string) string {
-	strIfc, ok := s.Values[name]
-	if !ok {
-		return dflt
-	}
-	str, ok := strIfc.(string)
-	if !ok {
-		return dflt
-	}
-	return str
-}
-
-func (s *Session) Int(name string, dflt int) int {
-	intIfc, ok := s.Values[name]
-	if !ok {
-		return dflt
-	}
-	i, ok := intIfc.(int)
-	if !ok {
-		return dflt
-	}
-	return i
+func NewFilesystemStore(path string, keyPairs ...[]byte) *Store {
+	return &Store{sessions.NewFilesystemStore(path, keyPairs...)}
 }

@@ -18,3 +18,7 @@ func StringToTime(str string) time.Time {
 type RowScanner interface {
 	Scan(...interface{}) error
 }
+
+func ReplaceQuotes(str string) string {
+	return quotes.Replace(str)
+}

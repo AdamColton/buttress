@@ -27,8 +27,10 @@ func NewTag(tag string, attrs ...string) *Tag {
 func (t *Tag) Name() string { return t.tag }
 
 // Write a tag to a writer
-func (t *Tag) Write(w io.Writer) {
-	t.write(newWriter(w))
+func (t *Tag) WriteTo(w io.Writer) (n int64, err error) {
+	nw := newWriter(w)
+	t.write(nw)
+	return int64(nw.sum), nw.err
 }
 
 func (t *Tag) write(w *writer) {
@@ -81,8 +83,10 @@ func NewVoidTag(tag string, attrs ...string) *VoidTag {
 func (t *VoidTag) Name() string { return t.tag }
 
 // Write a VoidTag to a writer
-func (t *VoidTag) Write(w io.Writer) {
-	t.write(newWriter(w))
+func (t *VoidTag) WriteTo(w io.Writer) (n int64, err error) {
+	nw := newWriter(w)
+	t.write(nw)
+	return int64(nw.sum), nw.err
 }
 
 func (t *VoidTag) write(w *writer) {

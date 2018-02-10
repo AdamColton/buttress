@@ -16,6 +16,10 @@ var ScriptLinks = []string{
 	"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js",
 }
 
+var Meta = [][]string{
+	{"name", "viewport", "content", "width=device-width, initial-scale=1"},
+}
+
 type Document struct {
 	*builder.Document
 	nav *html.Fragment
@@ -27,6 +31,10 @@ func NewDocument(title string) *Document {
 		CSSLinks(CSSLinks...).
 		ScriptLinks(ScriptLinks...).
 		AddChildren(nav)
+
+	for _, m := range Meta {
+		doc.Meta(m...)
+	}
 
 	return &Document{
 		Document: doc,

@@ -57,6 +57,9 @@ type standardMenu struct {
 func (menu standardMenu) populate(container html.ContainerNode) {
 	for _, mi := range menu.Menu {
 		b := builder.New()
+		if bf := mi.Before(); bf != "" {
+			b.Text(bf)
+		}
 		if mi.HasSub() {
 			b.Tag("li", "class", "dropdown").
 				Tag("a", mi.Attrs("class", "dropdown-toggle", "data-toggle", "dropdown", "role", "button", "aria-haspopup", "true", "aria-expanded", "false")...)
@@ -76,7 +79,10 @@ func (menu standardMenu) populate(container html.ContainerNode) {
 			b.Text(mi.Title()).
 				Close()
 		}
-		container.AddChildren(b.Cur())
+		if aft := mi.After(); aft != "" {
+			b.Text(aft)
+		}
+		container.AddChildren(b.Root())
 	}
 }
 

@@ -29,8 +29,10 @@ type fragment struct {
 	*parent
 }
 
-func (f *fragment) Write(w io.Writer) {
-	f.write(newWriter(w))
+func (f *fragment) WriteTo(w io.Writer) (n int64, err error) {
+	nw := newWriter(w)
+	f.write(nw)
+	return int64(nw.sum), nw.err
 }
 
 func (f *fragment) frag() *fragment {

@@ -51,6 +51,9 @@ type MenuItem interface {
 	SetTitle(string)
 	SetIcon(string)
 	SetHref(string)
+	SetBeforeAfter(string, string)
+	Before() string
+	After() string
 }
 
 type Menu []MenuItem
@@ -63,6 +66,8 @@ type menuItem struct {
 	href    string
 	subMenu Menu
 	divider bool
+	before  string
+	after   string
 }
 
 func (m *menuItem) Attrs(attrs ...string) []string {
@@ -116,3 +121,11 @@ func (m *menuItem) SetID(id string)       { m.id = id }
 func (m *menuItem) SetTitle(title string) { m.title = title }
 func (m *menuItem) SetIcon(icon string)   { m.icon = icon }
 func (m *menuItem) SetHref(href string)   { m.href = href }
+
+func (m *menuItem) SetBeforeAfter(before, after string) {
+	m.before = before
+	m.after = after
+}
+
+func (m *menuItem) Before() string { return m.before }
+func (m *menuItem) After() string  { return m.after }

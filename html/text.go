@@ -25,8 +25,10 @@ func NewText(text string) *Text {
 }
 
 // Write a Text Node to a writer.
-func (t *Text) Write(w io.Writer) {
-	t.write(newWriter(w))
+func (t *Text) WriteTo(w io.Writer) (n int64, err error) {
+	nw := newWriter(w)
+	t.write(nw)
+	return int64(nw.sum), nw.err
 }
 
 func (t *Text) write(w *writer) {

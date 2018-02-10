@@ -23,9 +23,9 @@ func TestWalker(t *testing.T) {
 	head := html.NewTag("head")
 	head.AddChildren(title)
 
-	html := html.NewTag("html")
-	html.AddChildren(head, body)
-	root := html.NewFragment(html.NewDoctype("html"), html)
+	htm := html.NewTag("html")
+	htm.AddChildren(head, body)
+	root := html.NewFragment(html.NewDoctype("html"), htm)
 
 	assert.NotNil(t, root)
 
@@ -46,7 +46,7 @@ func TestWalker(t *testing.T) {
 			},
 		},
 		{
-			node: html,
+			node: htm,
 			loc: &Location{
 				Path: NewPath(1),
 				Tag:  []int{0},

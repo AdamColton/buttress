@@ -13,30 +13,93 @@ var NewLine = "\n"
 // Padding is the string that is used to indent html
 var Padding = "  "
 
-// StringWriter takes a string as an argument (instead of []bytes). It is
-// fulfilled by bytes.Buffer.
-type StringWriter interface {
+type stringWriter interface {
 	WriteString(s string) (n int, err error)
 }
 
 // StringWriterWrapper can wrap any io.Writer to fulfill StringWriter
-type StringWriterWrapper struct {
+type stringWriterWrapper struct {
 	io.Writer
 }
 
 // WriteString fulfils StringWriter on StringWriterWrapper. It just casts the
 // string to []byte
-func (w StringWriterWrapper) WriteString(s string) (n int, err error) {
+func (w stringWriterWrapper) WriteString(s string) (n int, err error) {
 	return w.Write([]byte(s))
 }
 
-// ToStringWriter checks if the writer can be cast to a StringWriter and if it
-// cannot, it converts it using a StringWriterWrapper.
-func ToStringWriter(w io.Writer) StringWriter {
-	if sw, ok := w.(StringWriter); ok {
+func toStringWriter(w io.Writer) stringWriter {
+	if sw, ok := w.(stringWriter); ok {
 		return sw
 	}
-	return StringWriterWrapper{w}
+	return stringWriterWrapper{w}
+}
+
+type writer struct {
+	sw            stringWriter
+	onNewLine     bool
+	start         int
+	padding       string
+	parentPadding string
+	*counter
+}
+
+type counter struct {
+	err error
+	sum int
+}
+
+func newWriter(w io.Writer) *writer {
+	return &writer{
+		sw:      toStringWriter(w),
+		counter: &counter{},
+	}
+}
+
+func (w *writer) write(str string) {
+	if w.err != nil {
+		return
+	}
+	w.onNewLine = false
+	n, err := w.sw.WriteString(str)
+	w.sum += n
+	w.err = err
+}
+
+func (w *writer) nl() {
+	if w.err != nil {
+		return
+	}
+	w.onNewLine = true
+	n, err := w.sw.WriteString(NewLine)
+	w.sum += n
+	w.err = err
+	if w.err != nil {
+		return
+	}
+	n, err = w.sw.WriteString(w.padding)
+	w.sum += n
+	w.err = err
+}
+
+func (w *writer) pnl() {
+	w.onNewLine = true
+	n, err := w.sw.WriteString(NewLine)
+	w.sum += n
+	w.err = err
+	if w.err != nil {
+		return
+	}
+	n, err = w.sw.WriteString(w.parentPadding)
+	w.sum += n
+	w.err = err
+}
+
+func (w *writer) inc() *writer {
+	cp := *w
+	cp.parentPadding = cp.padding
+	cp.padding += Padding
+	return &cp
 }
 
 // String uses bytes.Buffer to render html as a string. This tends to be useful

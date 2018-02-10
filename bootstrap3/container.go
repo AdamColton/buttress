@@ -76,11 +76,14 @@ func NewRow(container html.ContainerNode) *Row {
 	}
 }
 
-func (r *Row) AddNode(class ColClass, node html.Node) {
-	r.cells = append(r.cells, &Cell{
-		Class:    class,
-		Contents: node,
-	})
+func (r *Row) AddNodes(class ColClass, nodes ...html.Node) *Row {
+	for _, n := range nodes {
+		r.cells = append(r.cells, &Cell{
+			Class:    class,
+			Contents: n,
+		})
+	}
+	return r
 }
 
 func (r *Row) AddCells(cells ...*Cell) {
