@@ -1,33 +1,46 @@
 package config
 
-var bools = make(map[string]map[string]bool) //[env][key] => val
-
 type BoolSetter interface {
-	As(bool, ...string) BoolSetter
+	As(bool, ...string) boolSetter
 }
 
 type boolSetter string
 
-func (s boolSetter) As(val bool, envs ...string) BoolSetter {
-	key := string(s)
-	if len(envs) == 0 {
-		envs = allEnvs
+func (s boolSetter) key() key {
+	return key{
+		name: string(s),
+		kind: boolKind,
+		env:  activeEnv,
+	}
+}
+
+func (s boolSetter) As(val bool, environments ...string) boolSetter {
+	if len(environments) == 0 {
+		environments = allenvironments
 	}
 
-	for _, envStr := range envs {
-		if env, ok := bools[envStr]; ok {
-			env[key] = val
-		}
+	k := s.key()
+	for _, envStr := range environments {
+		k.env = envStr
+		vals[k] = val
 	}
 	return s
 }
 
-func SetBool(key string) BoolSetter { return boolSetter(key) }
-func GetBool(key string) bool {
-	env, ok := bools[activeEnv]
+func SetBool(name string) boolSetter { return boolSetter(name) }
+func GetBool(name string) (bool, error) {
+	k := boolSetter(name).key()
+	v, ok := vals[k]
 	if !ok {
-		println("not found")
-		return false
+		return false, k.notFound()
 	}
-	return env[key]
+	return v.(bool), nil
+}
+
+func MustGetBool(name string) bool {
+	s, err := GetBool(name)
+	if err != nil {
+		panic(err)
+	}
+	return s
 }

@@ -4,55 +4,68 @@ import (
 	"encoding/base64"
 )
 
-var decodeString = base64.URLEncoding.DecodeString
-var encodeString = base64.URLEncoding.EncodeToString
-
-var bytes = make(map[string]map[string][]byte) //[env][key] => val
+var DecodeString = base64.URLEncoding.DecodeString
+var EncodeString = base64.URLEncoding.EncodeToString
 
 type BytesSetter interface {
-	As([]byte, ...string) BytesSetter
-	AsBase64(val string, envs ...string) BytesSetter
+	As(val []byte, environments ...string) BytesSetter
+	AsBase64(val string, environments ...string) (BytesSetter, error)
+	MustAsBase64(val string, environments ...string) BytesSetter
 }
 
 type bytesSetter string
 
-func (s bytesSetter) As(val []byte, envs ...string) BytesSetter {
-	key := string(s)
-	if len(envs) == 0 {
-		envs = allEnvs
+func (s bytesSetter) key() key {
+	return key{
+		name: string(s),
+		kind: bytesKind,
+		env:  activeEnv,
+	}
+}
+
+func (s bytesSetter) As(val []byte, environments ...string) BytesSetter {
+	if len(environments) == 0 {
+		environments = allenvironments
 	}
 
-	for _, envStr := range envs {
-		if env, ok := bytes[envStr]; ok {
-			env[key] = val
-		}
+	k := s.key()
+	for _, envStr := range environments {
+		k.env = envStr
+		vals[k] = val
 	}
 	return s
 }
 
-func (s bytesSetter) AsBase64(val string, envs ...string) BytesSetter {
-	b, err := decodeString(val)
+func (s bytesSetter) AsBase64(val string, environments ...string) (BytesSetter, error) {
+	b, err := DecodeString(val)
+	if err != nil {
+		return nil, err
+	}
+	return s.As(b, environments...), nil
+}
+
+func (s bytesSetter) MustAsBase64(val string, environments ...string) BytesSetter {
+	bs, err := s.AsBase64(val, environments...)
 	if err != nil {
 		panic(err)
 	}
-	key := string(s)
-	if len(envs) == 0 {
-		envs = allEnvs
-	}
-
-	for _, envStr := range envs {
-		if env, ok := bytes[envStr]; ok {
-			env[key] = b
-		}
-	}
-	return s
+	return bs
 }
 
-func SetBytes(key string) BytesSetter { return bytesSetter(key) }
-func GetBytes(key string) []byte {
-	env, ok := bytes[activeEnv]
+func SetBytes(name string) BytesSetter { return bytesSetter(name) }
+func GetBytes(name string) ([]byte, error) {
+	k := bytesSetter(name).key()
+	v, ok := vals[k]
 	if !ok {
-		return nil
+		return nil, k.notFound()
 	}
-	return env[key]
+	return v.([]byte), nil
+}
+
+func MustGetBytes(name string) []byte {
+	s, err := GetBytes(name)
+	if err != nil {
+		panic(err)
+	}
+	return s
 }

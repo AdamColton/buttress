@@ -1,32 +1,46 @@
 package config
 
-var strs = make(map[string]map[string]string) //[env][key] => val
-
 type StrSetter interface {
 	As(string, ...string) StrSetter
 }
 
 type strSetter string
 
-func (s strSetter) As(val string, envs ...string) StrSetter {
-	key := string(s)
-	if len(envs) == 0 {
-		envs = allEnvs
+func (s strSetter) key() key {
+	return key{
+		name: string(s),
+		kind: strKind,
+		env:  activeEnv,
+	}
+}
+
+func (s strSetter) As(val string, environments ...string) StrSetter {
+	if len(environments) == 0 {
+		environments = allenvironments
 	}
 
-	for _, envStr := range envs {
-		if env, ok := strs[envStr]; ok {
-			env[key] = val
-		}
+	k := s.key()
+	for _, envStr := range environments {
+		k.env = envStr
+		vals[k] = val
 	}
 	return s
 }
 
-func SetString(key string) StrSetter { return strSetter(key) }
-func GetString(key string) string {
-	env, ok := strs[activeEnv]
+func SetString(name string) StrSetter { return strSetter(name) }
+func GetString(name string) (string, error) {
+	k := strSetter(name).key()
+	v, ok := vals[k]
 	if !ok {
-		return ""
+		return "", k.notFound()
 	}
-	return env[key]
+	return v.(string), nil
+}
+
+func MustGetString(name string) string {
+	s, err := GetString(name)
+	if err != nil {
+		panic(err)
+	}
+	return s
 }
