@@ -35,10 +35,11 @@ func (f *Filter) SetMatch(expr string) error {
 }
 
 type Visit struct {
-	Path    string
-	Info    os.FileInfo
-	Err     error
-	Delete  bool
+	Path   string
+	Info   os.FileInfo
+	Err    error
+	Delete bool
+	// Matches holds the sub-matches from the regex
 	Matches []string
 }
 
