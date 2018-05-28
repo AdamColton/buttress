@@ -24,11 +24,15 @@ func NewDoctype(doctype string) *Doctype {
 func (d *Doctype) WriteTo(w io.Writer) (n int64, err error) {
 	nw := newWriter(w)
 	d.write(nw)
-	return int64(nw.sum), nw.err
+	return nw.Sum, nw.Err
 }
 
-func (d *Doctype) write(w *writer) {
-	w.write("<!DOCTYPE ")
-	w.write(d.doctype)
-	w.write(">")
+var (
+	openDocType = []byte("<!DOCTYPE ")
+)
+
+func (d *Doctype) write(w writer) {
+	w.Write(openDocType)
+	w.Write([]byte(d.doctype))
+	w.Write(closeBracket)
 }

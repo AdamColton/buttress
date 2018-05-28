@@ -127,19 +127,24 @@ func TestFormatWrap(t *testing.T) {
 	li2.AddChildren(NewText("Item 2"))
 	li3 := NewTag("li")
 	li3.AddChildren(NewText("Item 3"))
+	cmt := NewComment("Hi, I'm a comment")
 	ul := NewTag("ul")
 	ul.AddChildren(li1, li2, li3)
 	p1 := NewTag("p")
 	p1.AddChildren(NewText("This is a test"))
 	p2 := NewTag("p")
-	p2.AddChildren(NewText("This is a very long  paragraph that should be wrapped. It is longer than 80 characters so it will need to be on at least 2 lines, each indented to the same depth. This should be long enough, I hope."))
+	p2.AddChildren(NewText("This is a very long paragraph that should be wrapped. It is longer than 80 characters so it will need to be on at least 2 lines, each indented to the same depth. This should be long enough, I hope."))
 	p3 := NewTag("p")
 	p3.AddChildren(NewText("That's right, 3 paragraphs."))
+	longText := NewText("lenvoy granulet patrolman tined bookmark violaceously corporative arghel carbonify pinene Chamaecistus misfeature uninclinable unicellularity trampism hydracid Negritic lamentive ouf Neronize wanny quizzy cimbia agenesis")
 	div := NewTag("div")
-	div.AddChildren(p1, ul, p2)
-	f := NewFragment(div, p3)
+	div.AddChildren(p1, longText, ul, p2)
+	f := NewFragment(div, cmt, p3)
 	expected := `<div>
   <p>This is a test</p>
+  lenvoy granulet patrolman tined bookmark violaceously corporative arghel
+  carbonify pinene Chamaecistus misfeature uninclinable unicellularity trampism
+  hydracid Negritic lamentive ouf Neronize wanny quizzy cimbia agenesis
   <ul>
     <li>Item 1</li>
     <li>Item 2</li>
@@ -151,8 +156,11 @@ func TestFormatWrap(t *testing.T) {
     same depth. This should be long enough, I hope.
   </p>
 </div>
+<!--Hi, I'm a comment-->
 <p>That's right, 3 paragraphs.</p>`
-	assert.Equal(t, expected, String(f))
+	if !assert.Equal(t, expected, String(f)) {
+		t.Log("\n" + String(f))
+	}
 
 	assert.True(t, li1 == li1)
 }

@@ -8,7 +8,7 @@ import (
 type Node interface {
 	io.WriterTo
 	Parent() Node
-	write(*writer)
+	write(writer)
 	setParent(Node)
 }
 

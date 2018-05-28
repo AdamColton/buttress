@@ -45,15 +45,21 @@ func (a attributes) Attribute(key string) (string, bool) {
 	return v, ok
 }
 
-func (a attributes) write(w *writer) {
+var (
+	bSpace = []byte(" ")
+	bEqQt  = []byte(`="`)
+	bQt    = []byte(`"`)
+)
+
+func (a attributes) write(w writer) {
 	for _, k := range a.Attributes() {
 		v := a[k]
-		w.write(" ")
-		w.write(k)
+		w.Write(bSpace)
+		w.Write([]byte(k))
 		if v != "" {
-			w.write(`="`)
-			w.write(v)
-			w.write(`"`)
+			w.Write(bEqQt)
+			w.Write([]byte(v))
+			w.Write(bQt)
 		}
 	}
 }

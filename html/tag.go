@@ -30,25 +30,36 @@ func (t *Tag) Name() string { return t.tag }
 func (t *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	nw := newWriter(w)
 	t.write(nw)
-	return int64(nw.sum), nw.err
+	return nw.Sum, nw.Err
 }
 
-func (t *Tag) write(w *writer) {
-	w.write("<")
-	w.write(t.tag)
+var (
+	openBracket  = []byte("<")
+	closeBracket = []byte(">")
+	openCloseTag = []byte("</")
+	closeVoidTag = []byte("/>")
+)
+
+func (t *Tag) write(w writer) {
+	bTag := []byte(t.tag)
+	s0 := w.Sum
+	w.Write(openBracket)
+	w.Write(bTag)
+	closeLen := int(w.Sum-s0) + 2
 	t.attributes.write(w)
-	w.write(">")
+	w.Write(closeBracket)
+	lineLen := int(w.Sum-s0) + len(w.padding)
 
 	multiline := true
 	if l := len(t.fragment.children); l == 0 {
 		multiline = false
 	} else if l == 1 {
 		if text, ok := t.fragment.children[0].(*Text); ok {
-			multiline = strings.Contains(text.Text, "\n")
+			multiline = strings.Contains(text.Text, "\n") || len(text.Text)+lineLen+closeLen > w.wrapWidth
 		}
 	}
 
-	cw := w.inc()
+	cw := w.indent()
 	if multiline {
 		cw.nl()
 	}
@@ -56,9 +67,9 @@ func (t *Tag) write(w *writer) {
 	if multiline {
 		w.nl()
 	}
-	w.write("</")
-	w.write(t.tag)
-	w.write(">")
+	w.Write(openCloseTag)
+	w.Write(bTag)
+	w.Write(closeBracket)
 }
 
 // VoidTag is a self closing tag that cannot contain children
@@ -86,12 +97,12 @@ func (t *VoidTag) Name() string { return t.tag }
 func (t *VoidTag) WriteTo(w io.Writer) (n int64, err error) {
 	nw := newWriter(w)
 	t.write(nw)
-	return int64(nw.sum), nw.err
+	return nw.Sum, nw.Err
 }
 
-func (t *VoidTag) write(w *writer) {
-	w.write("<")
-	w.write(t.tag)
+func (t *VoidTag) write(w writer) {
+	w.Write(openBracket)
+	w.Write([]byte(t.tag))
 	t.attributes.write(w)
-	w.write(" />")
+	w.Write(closeVoidTag)
 }

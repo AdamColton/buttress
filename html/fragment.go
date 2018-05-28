@@ -32,14 +32,14 @@ type fragment struct {
 func (f *fragment) WriteTo(w io.Writer) (n int64, err error) {
 	nw := newWriter(w)
 	f.write(nw)
-	return int64(nw.sum), nw.err
+	return int64(nw.Sum), nw.Err
 }
 
 func (f *fragment) frag() *fragment {
 	return f
 }
 
-func (f *fragment) write(w *writer) {
+func (f *fragment) write(w writer) {
 	pad := false
 	for _, c := range f.children {
 		if pad {

@@ -1,11 +1,9 @@
 package html
 
 import (
+	"github.com/adamcolton/gothic/gothicio"
 	"io"
-	"strings"
 )
-
-var Wrapwidth = 80
 
 // Text represents an html text node.
 type Text struct {
@@ -28,39 +26,10 @@ func NewText(text string) *Text {
 func (t *Text) WriteTo(w io.Writer) (n int64, err error) {
 	nw := newWriter(w)
 	t.write(nw)
-	return int64(nw.sum), nw.err
+	return nw.Sum, nw.Err
 }
 
-func (t *Text) write(w *writer) {
-	if !t.Wrap || len([]rune(t.Text))+len([]rune(w.padding)) < Wrapwidth || NewLine == "" {
-		w.write(t.Text)
-		return
-	}
-
-	l := len([]rune(w.padding))
-	sum := l
-	if !w.onNewLine {
-		w.nl()
-	}
-	strs := strings.Split(t.Text, " ")
-	last := len(strs) - 1
-	for i, str := range strs {
-		if str == "" {
-			continue
-		}
-		ln := len([]rune(str))
-		sum += ln
-		if sum < Wrapwidth {
-			if !w.onNewLine {
-				sum++
-				w.write(" ")
-			}
-			w.write(str)
-		} else if i != last {
-			w.nl()
-			w.write(str)
-			sum = l + ln
-		}
-	}
-	w.pnl()
+func (t *Text) write(w writer) {
+	lww := gothicio.NewLineWrappingWriter(w)
+	lww.Write([]byte(t.Text))
 }
