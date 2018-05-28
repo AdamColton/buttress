@@ -10,18 +10,7 @@ func GoFiles(dir string) ([]string, error) {
 	return filepath.Glob(filepath.Join(dir, "*.go"))
 }
 
-// MostRecentModTime returns the most recently modfied file in a directory
-func MostRecentModTime(dir string) time.Time {
-	mrmtw := &mostRecentModeTimeWalker{}
-	filepath.Walk(dir, mrmtw.walkDir)
-	return mrmtw.Time
-}
-
-type mostRecentModeTimeWalker struct {
-	time.Time
-}
-
-func (mrmtw *mostRecentModeTimeWalker) walkDir(path string, info os.FileInfo, err error) error {
+func (mrmtw *mostRecentModTimeWalker) walkDir(path string, info os.FileInfo, err error) error {
 	if t := info.ModTime(); mrmtw.Before(t) {
 		mrmtw.Time = t
 	}
@@ -33,4 +22,8 @@ func SetDefault(cur, dflt string) string {
 		return dflt
 	}
 	return cur
+}
+
+type mostRecentModTimeWalker struct {
+	time.Time
 }
