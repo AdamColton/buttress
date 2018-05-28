@@ -18,17 +18,17 @@ func TestMutate(t *testing.T) {
 		return root
 	}
 
-	mc := MutateChain{m}
+	mc := Chain(m)
 	after := mc.Mutate(before)
 
 	assert.Equal(t, `<div class="top mutated">This is a test</div>`, html.String(after))
 }
 
-func TestAppendTags(t *testing.T) {
+func TestAppendAttrs(t *testing.T) {
 	before := html.NewTag("div", "class", "top")
 	before.AddChildren(html.NewText("This is a test"))
 
-	m, err := AppendTags(".top", "class", "mutated", "foo", "bar")
+	m, err := AppendAttrs(".top", "class", "mutated", "foo", "bar")
 	assert.NoError(t, err)
 	after := m.Mutate(before)
 
@@ -44,4 +44,24 @@ func TestAppendClass(t *testing.T) {
 	after := m.Mutate(before)
 
 	assert.Equal(t, `<div class="top mutated">This is a test</div>`, html.String(after))
+}
+
+type EmbedChain struct {
+	Text string
+	MutateChain
+}
+
+func (ec EmbedChain) Node() html.Node {
+	t := html.NewTag("div")
+	t.AddChildren(html.NewText(ec.Text))
+	return ec.Mutate(t)
+}
+
+func TestEmbed(t *testing.T) {
+	ec := EmbedChain{
+		Text: "This is a test",
+	}
+	err := ec.AddMutator(AppendClass("", "test-class"))
+	assert.NoError(t, err)
+	assert.Equal(t, `<div class="test-class">This is a test</div>`, html.String(ec.Node()))
 }
