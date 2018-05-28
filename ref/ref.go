@@ -81,6 +81,7 @@ const (
 	beyondEncoding
 )
 
+// Builder defines how references will be generated.
 type Builder struct {
 	Suffix string
 	SQL    string
@@ -89,6 +90,7 @@ type Builder struct {
 	Gob  bool
 }
 
+//
 func (rb Builder) New(gm *gomodel.GoModel, file *gothicgo.File, getByPrimaryFn gothicgo.FuncCaller) (*gothicgo.Struct, error) {
 	var suffix string
 	if rb.Suffix == "" {
@@ -118,12 +120,14 @@ func (rb Builder) New(gm *gomodel.GoModel, file *gothicgo.File, getByPrimaryFn g
 		Primary:  primary.Name(),
 		Name:     gm.Struct.Name(),
 		Receiver: gm.Struct.ReceiverName,
-		Call:     getByPrimaryFn.Call(file, gm.Struct.ReceiverName+"."+gm.GothicModel.Primary().Name()),
 	}
 
-	get := ref.NewMethod("Get")
-	get.Body = templates.TemplateTo("get", td)
-	get.Returns(gm.Struct.AsRet())
+	if getByPrimaryFn != nil {
+		td.Call = getByPrimaryFn.Call(file, gm.Struct.ReceiverName+"."+gm.GothicModel.Primary().Name())
+		get := ref.NewMethod("Get")
+		get.Body = templates.TemplateTo("get", td)
+		get.Returns(gm.Struct.AsRet())
+	}
 
 	fnName := ref.Name()
 	if strings.ToLower(gm.Struct.Name()) == gm.PackageRef().Name() {
