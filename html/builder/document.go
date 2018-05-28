@@ -6,17 +6,18 @@ import (
 )
 
 type Document struct {
-	header  *html.Tag
-	body    *html.Fragment
-	Scripts *html.Fragment
-	doc     *html.Fragment
+	header      *html.Tag
+	body        *html.Fragment
+	Scripts     *html.Fragment
+	doc         *html.Fragment
+	bodyBuilder *Builder
 }
 
 func NewDocument(title string, attrs ...string) *Document {
 	doc := &Document{
 		doc: html.NewFragment(html.NewDoctype("html")),
 	}
-	doc.header = html.NewTag("header")
+	doc.header = html.NewTag("head")
 	if title != "" {
 		titleTag := html.NewTag("title")
 		titleTag.AddChildren(html.NewText(title))
@@ -40,10 +41,13 @@ func (d *Document) AddChildren(children ...html.Node) *Document {
 }
 
 func (d *Document) Build() *Builder {
-	return &Builder{
-		root: d.body,
-		cur:  d.body,
+	if d.bodyBuilder == nil {
+		d.bodyBuilder = &Builder{
+			root: d.body,
+			cur:  d.body,
+		}
 	}
+	return d.bodyBuilder
 }
 
 func (d *Document) WriteTo(w io.Writer) (n int64, err error) {
@@ -71,4 +75,8 @@ func (d *Document) ScriptLinks(srcs ...string) *Document {
 func (d *Document) Meta(attrs ...string) *Document {
 	d.header.AddChildren(html.NewVoidTag("meta", attrs...))
 	return d
+}
+
+func (d *Document) Head() *html.Tag {
+	return d.header
 }

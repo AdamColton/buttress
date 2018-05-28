@@ -39,11 +39,32 @@ func (b *Builder) VoidTag(tag string, attrs ...string) *Builder {
 	return b
 }
 
+// Close the current container
 func (b *Builder) Close() *Builder {
 	if l := len(b.stack); l > 0 {
 		b.cur = b.stack[l-1]
 		b.stack = b.stack[:l-1]
 	}
+	return b
+}
+
+// CloseTag closes the current container and adds additional checks that it is
+// a tag and matches the tagStr. CloseTag will panic if these conditions are not
+// met.
+func (b *Builder) CloseTag(tagStr string) *Builder {
+	l := len(b.stack)
+	if l == 0 {
+		panic("Cannot close, no open tags")
+	}
+	tag, ok := b.cur.(*html.Tag)
+	if !ok {
+		panic("Open container is not a tag")
+	}
+	if tag.Name() != tagStr {
+		panic("Tag check failure, expected: " + tagStr + " got:" + tag.Name())
+	}
+	b.cur = b.stack[l-1]
+	b.stack = b.stack[:l-1]
 	return b
 }
 
