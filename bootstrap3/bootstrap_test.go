@@ -5,6 +5,7 @@ import (
 	"github.com/adamcolton/buttress/bootstrap3/csscontext"
 	"github.com/adamcolton/buttress/bootstrap3/csssize"
 	"github.com/adamcolton/buttress/html"
+	"github.com/adamcolton/buttress/html/mutate"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -137,7 +138,9 @@ func TestForm(t *testing.T) {
 		Style: fs,
 	}
 	f.AddInputTag("text", "Name", "name")
-	f.AddInputTag("text", "Age", "age")
+	age := f.AddInputTag("text", "Age", "age")
+	assert.NoError(t, age.AddMutator(mutate.AppendAttrs("", "id", "mutatorID")))
+
 	f.AddInputTag("text", "Role", "role")
 	f.AddText("TextTest", "here is some text")
 	f.AddConfirmPassword("password")
@@ -149,6 +152,5 @@ func TestForm(t *testing.T) {
 
 	s := html.String(f.Render())
 	assert.Contains(t, s, `<form class="form-horizontal">`)
-
-	println(s)
+	assert.Contains(t, s, `<div class="form-group" id="mutatorID">`)
 }

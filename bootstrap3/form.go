@@ -134,7 +134,7 @@ type InputTag struct {
 	ID    string
 	Name  string
 	Value string
-	*mutate.MutateChain
+	mutate.MutateChain
 }
 
 func NewInputTag(inputType, label, id string) *InputTag {
@@ -176,19 +176,16 @@ func (i *InputTag) FormRender(formStyle *FormStyle) html.Node {
 	}
 	fg := html.NewTag("div", "class", "form-group")
 	fg.AddChildren(label, input)
-	if i.MutateChain != nil {
-		return i.MutateChain.Mutate(fg)
-	}
 	if !formStyle.HideFeedback {
 		fg.AddChildren(html.NewTag("span", "class", "help-block "+formStyle.Feedback.String(), "id", i.ID+"-help"))
 	}
-	return fg
+	return i.MutateChain.Mutate(fg)
 }
 
 type Buttons struct {
 	Style   *FormStyle
 	Buttons []*Button
-	*mutate.MutateChain
+	mutate.MutateChain
 }
 
 type Button struct {
@@ -257,17 +254,14 @@ func (b *Buttons) FormRender(formStyle *FormStyle) html.Node {
 		buttons = []html.Node{div}
 	}
 	fg.AddChildren(buttons...)
-	if b.MutateChain != nil {
-		return b.MutateChain.Mutate(fg)
-	}
-	return fg
+	return b.MutateChain.Mutate(fg)
 }
 
 type Hidden struct {
 	ID    string
 	Name  string
 	Value string
-	*mutate.MutateChain
+	mutate.MutateChain
 }
 
 func NewHidden(id, value string) *Hidden {
@@ -284,10 +278,7 @@ func (h *Hidden) Render() html.Node {
 
 func (h *Hidden) FormRender(formStyle *FormStyle) html.Node {
 	hh := html.NewVoidTag("input", "type", "hidden", "id", h.ID, "name", h.Name, "value", h.Value)
-	if h.MutateChain != nil {
-		return h.MutateChain.Mutate(hh)
-	}
-	return hh
+	return h.MutateChain.Mutate(hh)
 }
 
 type ConfirmPassword struct {
@@ -296,7 +287,7 @@ type ConfirmPassword struct {
 	AgainLabel    string
 	ID            string
 	Name          string
-	*mutate.MutateChain
+	mutate.MutateChain
 }
 
 func NewConfirmPassword(id string) *ConfirmPassword {
@@ -322,15 +313,12 @@ func (c *ConfirmPassword) FormRender(formStyle *FormStyle) html.Node {
 	in2.Name = c.Name + "_confirm"
 
 	cph := html.NewFragment(in1.FormRender(formStyle), in2.FormRender(formStyle))
-	if c.MutateChain != nil {
-		return c.MutateChain.Mutate(cph)
-	}
-	return cph
+	return c.MutateChain.Mutate(cph)
 }
 
 type HTML struct {
 	Node html.Node
-	*mutate.MutateChain
+	mutate.MutateChain
 }
 
 func (h *HTML) Render() html.Node {
@@ -338,16 +326,13 @@ func (h *HTML) Render() html.Node {
 }
 
 func (h *HTML) FormRender(formStyle *FormStyle) html.Node {
-	if h.MutateChain != nil {
-		return h.MutateChain.Mutate(h.Node)
-	}
-	return h.Node
+	return h.MutateChain.Mutate(h.Node)
 }
 
 type Text struct {
 	Label string
 	Text  string
-	*mutate.MutateChain
+	mutate.MutateChain
 }
 
 func (t *Text) Render() html.Node {
@@ -370,10 +355,7 @@ func (t *Text) FormRender(formStyle *FormStyle) html.Node {
 	}
 	fg := html.NewTag("div", "class", "form-group")
 	fg.AddChildren(label, text)
-	if t.MutateChain != nil {
-		return t.MutateChain.Mutate(fg)
-	}
-	return fg
+	return t.MutateChain.Mutate(fg)
 }
 
 type SelectOption struct {
@@ -386,7 +368,7 @@ type Select struct {
 	Options []SelectOption
 	ID      string
 	Name    string
-	*mutate.MutateChain
+	mutate.MutateChain
 }
 
 func NewSelect(label, id string, opts []SelectOption) *Select {
@@ -423,8 +405,5 @@ func (s *Select) FormRender(formStyle *FormStyle) html.Node {
 	}
 	fg := html.NewTag("div", "class", "form-group")
 	fg.AddChildren(label, slct)
-	if s.MutateChain != nil {
-		return s.MutateChain.Mutate(fg)
-	}
-	return fg
+	return s.MutateChain.Mutate(fg)
 }
